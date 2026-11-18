@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, f
 app = Flask(__name__)
 app.secret_key = "parking-demo-key"
 
-RATE_PER_HOUR = 20  # Rs. per hour
+RATE_PER_HOUR = 30  # Rs. per hour
 
 
 def create_slots():
