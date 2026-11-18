@@ -200,9 +200,9 @@ git diff                                  # Show unstaged changes
 3. Click **Install suggested plugins**. This includes Git and Pipeline.
 4. Create the admin user and finish setup.
 5. Make sure Jenkins can use Docker: open Command Prompt and check `docker ps` works.
-   On Windows, if the build later says *docker is not recognized* or *permission denied*,
-   change the Jenkins service to run as your Windows user
-   (**services.msc → Jenkins → Properties → Log On → This account**) and restart Jenkins.
+   On Windows, Docker Desktop is installed for one user, so the Jenkinsfile adds Docker's
+   folder (`DOCKER_BIN`) to the PATH. Change `DOCKER_BIN` if Docker is installed elsewhere.
+   Docker Desktop must be open while Jenkins builds.
    On Linux, run `sudo usermod -aG docker jenkins` and restart Jenkins.
 
 📸 *Screenshot: Unlock screen, plugin installation, Jenkins dashboard.*

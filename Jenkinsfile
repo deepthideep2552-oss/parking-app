@@ -8,6 +8,9 @@ pipeline {
         IMAGE_NAME     = 'parking-app'
         CONTAINER_NAME = 'parking-app-container'
         APP_PORT       = '5000'
+        // Docker Desktop is installed for one Windows user, so docker.exe is not on
+        // the PATH of the Jenkins service (LocalSystem). runCmd() adds this folder.
+        DOCKER_BIN     = 'C:\\Users\\diisr\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin'
     }
 
     // Auto-trigger: Jenkins checks GitHub every 2 minutes for new commits.
@@ -27,6 +30,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    runCmd("docker version")
                     runCmd("docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} -t ${IMAGE_NAME}:latest .")
                 }
             }
@@ -66,6 +70,8 @@ def runCmd(String cmd, boolean ignoreErrors = false) {
     if (isUnix()) {
         return sh(script: cmd, returnStatus: ignoreErrors)
     } else {
-        return bat(script: cmd, returnStatus: ignoreErrors)
+        return withEnv(["PATH+DOCKER=${env.DOCKER_BIN}"]) {
+            bat(script: cmd, returnStatus: ignoreErrors)
+        }
     }
 }
