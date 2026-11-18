@@ -13,6 +13,11 @@ pipeline {
         DOCKER_BIN     = 'C:\\Users\\diisr\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin'
     }
 
+    // Run one build at a time, so two builds never deploy the same container at once.
+    options {
+        disableConcurrentBuilds()
+    }
+
     // Auto-trigger: Jenkins checks GitHub every 2 minutes for new commits.
     // (If you set up a GitHub webhook, the build starts instantly instead.)
     triggers {
