@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parking Slot Booking System</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f4f7; margin: 0; }
+    header { background: #263238; color: #fff; padding: 18px 30px; }
+    header h1 { margin: 0; font-size: 24px; }
+    header p { margin: 4px 0 0; font-size: 13px; opacity: .8; }
+    main { max-width: 950px; margin: 25px auto; padding: 0 15px; }
+    .card { background: #fff; padding: 20px; border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.08); margin-bottom: 20px; }
+    .stats { display: flex; gap: 15px; }
+    .stat { flex: 1; text-align: center; padding: 14px; border-radius: 8px; color: #fff; }
+    .stat b { display: block; font-size: 28px; }
+    .total { background: #455a64; } .free { background: #2e7d32; } .busy { background: #c62828; }
+    form.book { display: flex; gap: 10px; flex-wrap: wrap; }
+    input, select { padding: 9px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 140px; }
+    button { padding: 9px 16px; border: 0; border-radius: 4px; cursor: pointer; }
+    .btn-book { background: #1565c0; color: #fff; }
+    .btn-release { background: #fff; color: #c62828; border: 1px solid #c62828;
+                   padding: 4px 10px; font-size: 12px; margin-top: 6px; }
+    .msg { padding: 10px 14px; border-radius: 6px; margin-bottom: 15px; }
+    .msg.success { background: #e8f5e9; color: #1b5e20; }
+    .msg.error { background: #ffebee; color: #b71c1c; }
+    h2 { font-size: 17px; margin: 0 0 12px; }
+    .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin-bottom: 18px; }
+    .slot { border-radius: 6px; padding: 10px 4px; text-align: center; font-size: 12px; min-height: 78px; }
+    .slot .id { font-size: 16px; font-weight: bold; }
+    .slot.open { background: #e8f5e9; border: 2px solid #43a047; }
+    .slot.taken { background: #ffebee; border: 2px solid #e53935; }
+    .legend span { display: inline-block; margin-right: 15px; font-size: 13px; }
+    footer { text-align: center; color: #777; font-size: 12px; margin: 10px 0 25px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Parking Slot Booking System</h1>
+    <p>Deployed with Docker &amp; Jenkins CI/CD Pipeline &middot; Rate: Rs. {{ rate }} / hour</p>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, m in messages %}<div class="msg {{ cat }}">{{ m }}</div>{% endfor %}
+    {% endwith %}
+
+    <div class="card stats">
+      <div class="stat total"><b>{{ summary.total }}</b>Total Slots</div>
+      <div class="stat free"><b>{{ summary.free }}</b>Available</div>
+      <div class="stat busy"><b>{{ summary.booked }}</b>Booked</div>
+    </div>
+
+    <div class="card">
+      <h2>Book a Slot</h2>
+      <form class="book" action="/book" method="post">
+        <select name="slot_id" required>
+          <option value="">Select free slot</option>
+          {% for s in slots if not s.booked %}
+          <option value="{{ s.id }}">{{ s.id }} ({{ s.type }})</option>
+          {% endfor %}
+        </select>
+        <input name="vehicle" placeholder="Vehicle no. e.g. TN01AB1234" required>
+        <input name="owner" placeholder="Owner name">
+        <button class="btn-book" type="submit">Book Slot</button>
+      </form>
+    </div>
+
+    <div class="card">
+      {% for level in ['A', 'B'] %}
+      <h2>Level {{ level }}</h2>
+      <div class="grid">
+        {% for s in slots if s.id.startswith(level) %}
+        <div class="slot {{ 'taken' if s.booked else 'open' }}">
+          <div class="id">{{ s.id }}</div>
+          <div>{{ s.type }}</div>
+          {% if s.booked %}
+            <div><b>{{ s.vehicle }}</b></div>
+            <form action="/release/{{ s.id }}" method="post" style="margin:0">
+              <button class="btn-release" type="submit">Release</button>
+            </form>
+          {% else %}
+            <div>Free</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <div class="legend"><span>🟩 Available</span><span>🟥 Booked</span></div>
+    </div>
+  </main>
+  <footer>MCA DevOps Assignment</footer>
+</body>
+</html>

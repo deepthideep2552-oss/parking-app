@@ -1,0 +1,2 @@
+# Keep Linux line endings for shell scripts (so they run in Git Bash / Linux / Jenkins)
+*.sh text eol=lf

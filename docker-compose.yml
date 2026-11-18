@@ -1,0 +1,19 @@
+# docker-compose.yml - run the Parking Slot Booking System with one command
+#   Start : docker compose up -d --build
+#   Stop  : docker compose down
+
+services:
+  parking-app:
+    build: .                      # build image from the Dockerfile in this folder
+    image: parking-app:latest
+    container_name: parking-app-compose
+    ports:
+      - "5001:5000"               # host port 5001 (5000 is used by the Jenkins deploy)
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

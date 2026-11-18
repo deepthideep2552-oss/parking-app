@@ -1,0 +1,33 @@
+# deployment.yaml - runs 2 copies (pods) of the parking app in Kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parking-app
+  labels:
+    app: parking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: parking-app
+  template:
+    metadata:
+      labels:
+        app: parking-app
+    spec:
+      containers:
+        - name: parking-app
+          image: parking-app:latest
+          imagePullPolicy: Never      # use the image built locally with Docker Desktop
+          ports:
+            - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
